@@ -1,15 +1,27 @@
-import { RecoilRoot } from 'recoil';
+import { useEffect } from 'react';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { RouterProvider } from 'react-router-dom';
 import * as RadixToast from '@radix-ui/react-toast';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toast, ThemeProvider, ToastProvider } from '@librechat/client';
+import { Toast, ThemeProvider, ToastProvider, applyFontSize } from '@librechat/client';
 import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { ScreenshotProvider, useApiErrorBoundary } from './hooks';
 import { getThemeFromEnv } from './utils/getThemeFromEnv';
 import { LiveAnnouncer } from '~/a11y';
 import { router } from './routes';
+import store from '~/store';
+
+const FontSizeInitializer = () => {
+  const fontSize = useRecoilValue(store.fontSize);
+
+  useEffect(() => {
+    applyFontSize(fontSize);
+  }, [fontSize]);
+
+  return null;
+};
 
 const App = () => {
   const { setError } = useApiErrorBoundary();
@@ -44,6 +56,7 @@ const App = () => {
             <RadixToast.Provider>
               <ToastProvider>
                 <DndProvider backend={HTML5Backend}>
+                  <FontSizeInitializer />
                   <RouterProvider router={router} />
                   <ReactQueryDevtools initialIsOpen={false} position="top-right" />
                   <Toast />
